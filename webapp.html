@@ -7,26 +7,32 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
-        .restaurant-info, .bill-info {
-            margin-bottom: 20px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .menu-item {
-            cursor: pointer;
+        th, td {
             padding: 10px;
             border: 1px solid #ddd;
-            margin-bottom: 5px;
+            text-align: left;
         }
 
-        .menu-item.selected {
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr.selected {
             background-color: #90ee90;
         }
 
         .total {
-            font-weight: bold;
             margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -44,9 +50,19 @@
     <p>Waiter: <span id="waiter-name"></span></p>
 </div>
 
-<div id="menu-items">
-    <!-- Menu items will be loaded here -->
-</div>
+<table id="bill-table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Price</th>
+        <th>Quantity</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Items will be loaded here -->
+    </tbody>
+</table>
 
 <div class="total">
     Total Selected: <span id="total-selected">0.00</span>
@@ -111,15 +127,15 @@
     };
 
     function calculateTotal() {
-        const selectedItems = document.querySelectorAll('.menu-item.selected');
-        const total = Array.from(selectedItems).reduce((acc, item) => {
-            return acc + parseFloat(item.dataset.price);
-        }, 0);
+        let total = 0;
+        document.querySelectorAll('tr.selected').forEach(row => {
+            total += parseFloat(row.getAttribute('data-price')) * parseInt(row.getAttribute('data-quantity'), 10);
+        });
         document.getElementById('total-selected').innerText = total.toFixed(2);
     }
 
-    function toggleSelection(item) {
-        item.classList.toggle('selected');
+    function toggleSelection(row) {
+        row.classList.toggle('selected');
         calculateTotal();
     }
 
@@ -133,14 +149,18 @@
         document.getElementById('hall-info').innerText = guest_bill.hall;
         document.getElementById('waiter-name').innerText = guest_bill.waiter;
 
-        const menuItemsContainer = document.getElementById('menu-items');
+        const tableBody = document.getElementById('bill-table').querySelector('tbody');
         guest_bill.items.forEach(item => {
-            const menuItemElement = document.createElement('div');
-            menuItemElement.classList.add('menu-item');
-            menuItemElement.innerText = `${item.name} - ${item.price} x ${item.quantity}`;
-            menuItemElement.dataset.price = item.price;
-            menuItemElement.onclick = () => toggleSelection(menuItemElement);
-            menuItemsContainer.appendChild(menuItemElement);
+            const row = tableBody.insertRow();
+            row.setAttribute('data-price', item.price);
+            row.setAttribute('data-quantity', item.quantity);
+            row.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.amount || ''}</td>
+      <td>${item.price}</td>
+      <td>${item.quantity}</td>
+    `;
+            row.onclick = () => toggleSelection(row);
         });
     }
 
