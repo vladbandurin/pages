@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Splitter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .restaurant-info, .bill-info {
+            margin-bottom: 20px;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+
+        .menu-item.selected {
+            background-color: #90ee90;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="restaurant-info">
+    <h1 id="restaurant-name"></h1>
+    <p id="restaurant-inn"></p>
+</div>
+
+<div class="bill-info">
+    <p>Table: <span id="table-number"></span></p>
+    <p>Order: <span id="order-number"></span></p>
+    <p>Hall: <span id="hall-info"></span></p>
+    <p>Waiter: <span id="waiter-name"></span></p>
+</div>
+
+<div id="menu-items">
+    <!-- Menu items will be loaded here -->
+</div>
+
+<div class="total">
+    Total Selected: <span id="total-selected">0.00</span>
+</div>
+
+<script>
+    const billData = {
+        "restaurant": {
+            "name": "BLUSH",
+            "INN": "7703400647"
+        },
+        "bank_guarantees": {
+            "name": "БАНКОВСКИЕ ГАРАНТИИ",
+            "number": "24",
+            "capital": "СТОЛИЦА"
+        },
+        "guest_bill": {
+            "table": "14",
+            "order_number": "20512",
+            "hall": "1. Основной зал",
+            "opened": "16.11.2019 16:20",
+            "waiter": "ЛюбЧУК Д.",
+            "items": [
+                {
+                    "name": "Velvet Season Саперави",
+                    "amount": "150 мл",
+                    "price": "230.00",
+                    "quantity": "1"
+                },
+                {
+                    "name": "Домен Гобельсбург Грюнер Ве",
+                    "amount": "150 мл",
+                    "price": "390.00",
+                    "quantity": "1"
+                },
+                {
+                    "name": "Плато сыров",
+                    "price": "990.00",
+                    "quantity": "1"
+                },
+                {
+                    "name": "Белая треска с пюре из сель",
+                    "price": "690.00",
+                    "quantity": "1"
+                },
+                {
+                    "name": "Паста с кроликом",
+                    "price": "430.00",
+                    "quantity": "1"
+                }
+            ],
+            "total": "2730.00",
+            "tip_suggestions": {
+                "satisfactory": "52 РУБ.",
+                "good": "273 РУБ.",
+                "excellent": "410 РУБ."
+            },
+            "suggestions_email": "guestblush2@gmail.com",
+            "thank_you_note": "СПАСИБО! ЖДЕМ ВАС СНОВА!"
+        }
+
+    };
+
+    function calculateTotal() {
+        const selectedItems = document.querySelectorAll('.menu-item.selected');
+        const total = Array.from(selectedItems).reduce((acc, item) => {
+            return acc + parseFloat(item.dataset.price);
+        }, 0);
+        document.getElementById('total-selected').innerText = total.toFixed(2);
+    }
+
+    function toggleSelection(item) {
+        item.classList.toggle('selected');
+        calculateTotal();
+    }
+
+    function loadBillData() {
+        const {restaurant, guest_bill} = billData;
+        document.getElementById('restaurant-name').innerText = restaurant.name;
+        document.getElementById('restaurant-inn').innerText = `INN: ${restaurant.INN}`;
+
+        document.getElementById('table-number').innerText = guest_bill.table;
+        document.getElementById('order-number').innerText = guest_bill.order_number;
+        document.getElementById('hall-info').innerText = guest_bill.hall;
+        document.getElementById('waiter-name').innerText = guest_bill.waiter;
+
+        const menuItemsContainer = document.getElementById('menu-items');
+        guest_bill.items.forEach(item => {
+            const menuItemElement = document.createElement('div');
+            menuItemElement.classList.add('menu-item');
+            menuItemElement.innerText = `${item.name} - ${item.price} x ${item.quantity}`;
+            menuItemElement.dataset.price = item.price;
+            menuItemElement.onclick = () => toggleSelection(menuItemElement);
+            menuItemsContainer.appendChild(menuItemElement);
+        });
+    }
+
+    loadBillData();
+</script>
+</body>
+</html>
