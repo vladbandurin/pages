@@ -69,102 +69,121 @@
 </div>
 
 <script>
-    const billData = {
-        "restaurant": {
-            "name": "BLUSH",
-            "INN": "7703400647"
-        },
-        "bank_guarantees": {
-            "name": "БАНКОВСКИЕ ГАРАНТИИ",
-            "number": "24",
-            "capital": "СТОЛИЦА"
-        },
-        "guest_bill": {
-            "table": "14",
-            "order_number": "20512",
-            "hall": "1. Основной зал",
-            "opened": "16.11.2019 16:20",
-            "waiter": "ЛюбЧУК Д.",
-            "items": [
-                {
-                    "name": "Velvet Season Саперави",
-                    "amount": "150 мл",
-                    "price": "230.00",
-                    "quantity": "1"
-                },
-                {
-                    "name": "Домен Гобельсбург Грюнер Ве",
-                    "amount": "150 мл",
-                    "price": "390.00",
-                    "quantity": "1"
-                },
-                {
-                    "name": "Плато сыров",
-                    "price": "990.00",
-                    "quantity": "1"
-                },
-                {
-                    "name": "Белая треска с пюре из сель",
-                    "price": "690.00",
-                    "quantity": "1"
-                },
-                {
-                    "name": "Паста с кроликом",
-                    "price": "430.00",
-                    "quantity": "1"
-                }
-            ],
-            "total": "2730.00",
-            "tip_suggestions": {
-                "satisfactory": "52 РУБ.",
-                "good": "273 РУБ.",
-                "excellent": "410 РУБ."
-            },
-            "suggestions_email": "guestblush2@gmail.com",
-            "thank_you_note": "СПАСИБО! ЖДЕМ ВАС СНОВА!"
+    document.addEventListener('DOMContentLoaded', function () {
+        // Parse the URL parameters to get the data
+        const urlParams = new URLSearchParams(window.location.search);
+        const data = urlParams.get('data');
+
+        // Parse the data from a JSON string to an object
+        const billData = JSON.parse(decodeURIComponent(data));
+
+        // Now you can use `webAppData` in your Web App
+        console.log(billData);
+
+
+        // const billData = {
+        //     "restaurant": {
+        //         "name": "BLUSH",
+        //         "INN": "7703400647"
+        //     },
+        //     "bank_guarantees": {
+        //         "name": "БАНКОВСКИЕ ГАРАНТИИ",
+        //         "number": "24",
+        //         "capital": "СТОЛИЦА"
+        //     },
+        //     "guest_bill": {
+        //         "table": "14",
+        //         "order_number": "20512",
+        //         "hall": "1. Основной зал",
+        //         "opened": "16.11.2019 16:20",
+        //         "waiter": "ЛюбЧУК Д.",
+        //         "items": [
+        //             {
+        //                 "name": "Velvet Season Саперави",
+        //                 "amount": "150 мл",
+        //                 "price": "230.00",
+        //                 "quantity": "1"
+        //             },
+        //             {
+        //                 "name": "Домен Гобельсбург Грюнер Ве",
+        //                 "amount": "150 мл",
+        //                 "price": "390.00",
+        //                 "quantity": "1"
+        //             },
+        //             {
+        //                 "name": "Плато сыров",
+        //                 "price": "990.00",
+        //                 "quantity": "1"
+        //             },
+        //             {
+        //                 "name": "Белая треска с пюре из сель",
+        //                 "price": "690.00",
+        //                 "quantity": "1"
+        //             },
+        //             {
+        //                 "name": "Паста с кроликом",
+        //                 "price": "430.00",
+        //                 "quantity": "1"
+        //             }
+        //         ],
+        //         "total": "2730.00",
+        //         "tip_suggestions": {
+        //             "satisfactory": "52 РУБ.",
+        //             "good": "273 РУБ.",
+        //             "excellent": "410 РУБ."
+        //         },
+        //         "suggestions_email": "guestblush2@gmail.com",
+        //         "thank_you_note": "СПАСИБО! ЖДЕМ ВАС СНОВА!"
+        //     }
+        //
+        // };
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('tr.selected').forEach(row => {
+                total += parseFloat(row.getAttribute('data-price')) * parseInt(row.getAttribute('data-quantity'), 10);
+            });
+            document.getElementById('total-selected').innerText = total.toFixed(2);
         }
 
-    };
+        function toggleSelection(row) {
+            row.classList.toggle('selected');
+            calculateTotal();
+        }
 
-    function calculateTotal() {
-        let total = 0;
-        document.querySelectorAll('tr.selected').forEach(row => {
-            total += parseFloat(row.getAttribute('data-price')) * parseInt(row.getAttribute('data-quantity'), 10);
-        });
-        document.getElementById('total-selected').innerText = total.toFixed(2);
-    }
+        function loadBillData() {
+            const {restaurant, guest_bill} = billData;
+            document.getElementById('restaurant-name').innerText = restaurant.name;
+            document.getElementById('restaurant-inn').innerText = `INN: ${restaurant.INN}`;
 
-    function toggleSelection(row) {
-        row.classList.toggle('selected');
-        calculateTotal();
-    }
+            document.getElementById('table-number').innerText = guest_bill.table;
+            document.getElementById('order-number').innerText = guest_bill.order_number;
+            document.getElementById('hall-info').innerText = guest_bill.hall;
+            document.getElementById('waiter-name').innerText = guest_bill.waiter;
 
-    function loadBillData() {
-        const {restaurant, guest_bill} = billData;
-        document.getElementById('restaurant-name').innerText = restaurant.name;
-        document.getElementById('restaurant-inn').innerText = `INN: ${restaurant.INN}`;
-
-        document.getElementById('table-number').innerText = guest_bill.table;
-        document.getElementById('order-number').innerText = guest_bill.order_number;
-        document.getElementById('hall-info').innerText = guest_bill.hall;
-        document.getElementById('waiter-name').innerText = guest_bill.waiter;
-
-        const tableBody = document.getElementById('bill-table').querySelector('tbody');
-        guest_bill.items.forEach(item => {
-            const row = tableBody.insertRow();
-            row.setAttribute('data-price', item.price);
-            row.setAttribute('data-quantity', item.quantity);
-            row.innerHTML = `
+            const tableBody = document.getElementById('bill-table').querySelector('tbody');
+            guest_bill.items.forEach(item => {
+                const row = tableBody.insertRow();
+                row.setAttribute('data-price', item.price);
+                row.setAttribute('data-quantity', item.quantity);
+                row.innerHTML = `
       <td>${item.name}</td>
       <td>${item.amount || ''}</td>
       <td>${item.price}</td>
       <td>${item.quantity}</td>
     `;
-            row.onclick = () => toggleSelection(row);
-        });
-    }
+                row.onclick = () => toggleSelection(row);
+            });
+        }
 
-    loadBillData();
+        loadBillData()
+    });
+    ;
+</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    let tg = window.Telegram.WebApp;
+
 </script>
 </body>
 </html>
