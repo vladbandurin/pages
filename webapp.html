@@ -37,17 +37,9 @@
     </style>
 </head>
 <body>
-
 <div class="restaurant-info">
     <h1 id="restaurant-name"></h1>
-    <p id="restaurant-inn"></p>
-</div>
-
-<div class="bill-info">
-    <p>Table: <span id="table-number"></span></p>
-    <p>Order: <span id="order-number"></span></p>
-    <p>Hall: <span id="hall-info"></span></p>
-    <p>Waiter: <span id="waiter-name"></span></p>
+    <p>Bill Time: <span id="bill-time"></span></p>
 </div>
 
 <table id="bill-table">
@@ -55,8 +47,9 @@
     <tr>
         <th>Name</th>
         <th>Amount</th>
-        <th>Price</th>
         <th>Quantity</th>
+        <th>Sum</th>
+
     </tr>
     </thead>
     <tbody>
@@ -77,71 +70,13 @@
         // Parse the data from a JSON string to an object
         const billData = JSON.parse(decodeURIComponent(data));
 
-        // Now you can use `webAppData` in your Web App
+        // Now you can use `billData` in your Web App
         console.log(billData);
-
-
-        // const billData = {
-        //     "restaurant": {
-        //         "name": "BLUSH",
-        //         "INN": "7703400647"
-        //     },
-        //     "bank_guarantees": {
-        //         "name": "БАНКОВСКИЕ ГАРАНТИИ",
-        //         "number": "24",
-        //         "capital": "СТОЛИЦА"
-        //     },
-        //     "guest_bill": {
-        //         "table": "14",
-        //         "order_number": "20512",
-        //         "hall": "1. Основной зал",
-        //         "opened": "16.11.2019 16:20",
-        //         "waiter": "ЛюбЧУК Д.",
-        //         "items": [
-        //             {
-        //                 "name": "Velvet Season Саперави",
-        //                 "amount": "150 мл",
-        //                 "price": "230.00",
-        //                 "quantity": "1"
-        //             },
-        //             {
-        //                 "name": "Домен Гобельсбург Грюнер Ве",
-        //                 "amount": "150 мл",
-        //                 "price": "390.00",
-        //                 "quantity": "1"
-        //             },
-        //             {
-        //                 "name": "Плато сыров",
-        //                 "price": "990.00",
-        //                 "quantity": "1"
-        //             },
-        //             {
-        //                 "name": "Белая треска с пюре из сель",
-        //                 "price": "690.00",
-        //                 "quantity": "1"
-        //             },
-        //             {
-        //                 "name": "Паста с кроликом",
-        //                 "price": "430.00",
-        //                 "quantity": "1"
-        //             }
-        //         ],
-        //         "total": "2730.00",
-        //         "tip_suggestions": {
-        //             "satisfactory": "52 РУБ.",
-        //             "good": "273 РУБ.",
-        //             "excellent": "410 РУБ."
-        //         },
-        //         "suggestions_email": "guestblush2@gmail.com",
-        //         "thank_you_note": "СПАСИБО! ЖДЕМ ВАС СНОВА!"
-        //     }
-        //
-        // };
 
         function calculateTotal() {
             let total = 0;
             document.querySelectorAll('tr.selected').forEach(row => {
-                total += parseFloat(row.getAttribute('data-price')) * parseInt(row.getAttribute('data-quantity'), 10);
+                total += parseFloat(row.getAttribute('data-sum'));
             });
             document.getElementById('total-selected').innerText = total.toFixed(2);
         }
@@ -152,38 +87,32 @@
         }
 
         function loadBillData() {
-            const {restaurant, guest_bill} = billData;
-            document.getElementById('restaurant-name').innerText = restaurant.name;
-            document.getElementById('restaurant-inn').innerText = `INN: ${restaurant.INN}`;
-
-            document.getElementById('table-number').innerText = guest_bill.table;
-            document.getElementById('order-number').innerText = guest_bill.order_number;
-            document.getElementById('hall-info').innerText = guest_bill.hall;
-            document.getElementById('waiter-name').innerText = guest_bill.waiter;
+            document.getElementById('restaurant-name').innerText = billData.restaurant_name;
+            document.getElementById('bill-time').innerText = billData.bill_time;
 
             const tableBody = document.getElementById('bill-table').querySelector('tbody');
-            guest_bill.items.forEach(item => {
+            billData.items.forEach(item => {
                 const row = tableBody.insertRow();
-                row.setAttribute('data-price', item.price);
+
                 row.setAttribute('data-quantity', item.quantity);
+                row.setAttribute('data-sum', item.sum);
                 row.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.amount || ''}</td>
-      <td>${item.price}</td>
-      <td>${item.quantity}</td>
-    `;
+                    <td>${item.name}</td>
+                    <td>${item.amount || ''}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.sum}</td>
+                `;
                 row.onclick = () => toggleSelection(row);
             });
         }
 
-        loadBillData()
+        loadBillData();
     });
-    ;
 </script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
     let tg = window.Telegram.WebApp;
-
+    // You can add additional Telegram Web App SDK functionality here if needed
 </script>
 </body>
 </html>
