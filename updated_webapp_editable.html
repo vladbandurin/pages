@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Splitter</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .selected {
+            background-color: #90ee90 !important;
+        }
+
+        .total-sum {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            table {
+                width: 100%;
+            }
+        }
+    </style>
+
+    </style>
+</head>
+<body>
+<div class="restaurant-info">
+    <h1 id="restaurant-name"></h1>
+    <p>Bill Time: <span id="bill-time"></span></p>
+</div>
+
+<table id="bill-table">
+    <thead>
+    <tr>
+        <th>Item Name</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Items will be loaded here -->
+    </tbody>
+</table>
+
+<div class="total">
+    Total Selected: <span id="total-selected">0.00</span>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const data = urlParams.get('data');
+        const billData = JSON.parse(decodeURIComponent(data));
+        console.log(billData);
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('tr.selected').forEach(row => {
+                total += parseFloat(row.getAttribute('data-price'));
+            });
+            document.getElementById('total-selected').innerText = total.toFixed(2);
+        }
+
+        function toggleSelection(row) {
+            row.classList.toggle('selected');
+            calculateTotal();
+        }
+
+        function loadBillData() {
+            document.getElementById('restaurant-name').innerText = billData.restaurant_name;
+            document.getElementById('bill-time').innerText = billData.bill_time;
+            const tableBody = document.getElementById('bill-table').querySelector('tbody');
+            billData.items.forEach(item => {
+                const row = tableBody.insertRow();
+                row.setAttribute('data-price', item.price);
+                row.innerHTML = `
+                        <td contenteditable="true">${item.name}</td>
+                        <td contenteditable="true">${item.quantity}</td>
+                        <td contenteditable="true">${item.price}</td>
+                    `;
+                row.onclick = () => toggleSelection(row);
+            });
+            document.getElementById('total-amount').innerText = billData.total;
+        }
+
+        loadBillData();
+    });
+</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand(); //расширяем на все окно
+    tg.MainButton.text = "Changed Text"; //изменяем текст кнопки
+    tg.MainButton.setText("Changed Text1"); //изменяем текст кнопки иначе
+    tg.MainButton.textColor = "#F55353"; //изменяем цвет текста кнопки
+    tg.MainButton.color = "#143F6B"; //изменяем цвет бэкграунда кнопки
+    tg.MainButton.setParams({"color": "#143F6B"}); //так изменяются все параметры
+
+    // You can add additional Telegram Web App SDK functionality here if needed
+</script>
+
+<button id="submit-button"
+        style="padding: 10px 20px; margin-top: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    Submit
+</button>
+
+<script>
+    document.getElementById('submit-button').addEventListener('click', function () {
+        let selectedItems = [];
+        document.querySelectorAll('tr.selected').forEach(row => {
+            const itemData = {
+                name: row.cells[0].innerText,
+                quantity: row.cells[1].innerText,
+                price: row.cells[2].innerText
+            };
+            selectedItems.push(itemData);
+        });
+
+        const returnData = {
+            user: "Guest 1",
+            selectedItems: selectedItems
+        }
+        // Send data to the Telegram bot
+        if (selectedItems.length > 0) {
+            tg.sendData(JSON.stringify(returnData));
+        }
+
+    });
+</script>
+</body>
+</html>
