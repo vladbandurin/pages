@@ -61,9 +61,15 @@
                 width: 100%;
             }
         }
+
+        .single-line-cell {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /*max-width: 100px; !* Adjust as needed *!*/
+        }
     </style>
 
-    </style>
 </head>
 <body>
 <div class="restaurant-info">
@@ -117,8 +123,8 @@
                 row.setAttribute('data-price', item.price);
                 row.innerHTML = `
                         <td contenteditable="true">${item.name}</td>
-                        <td contenteditable="true">${item.quantity}</td>
-                        <td contenteditable="true">${item.price}</td>
+                        <td contenteditable="true" class="single-line-cell">${item.quantity}</td>
+                        <td contenteditable="true" class="single-line-cell">${item.price}</td>
                     `;
                 row.onclick = () => toggleSelection(row);
             });
@@ -128,9 +134,34 @@
         loadBillData();
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // ... existing code ...
+
+        // Add event listener to handle Enter key in single-line cells
+        document.querySelectorAll('.single-line-cell').forEach(cell => {
+            cell.onkeydown = function (e) {
+                if (!e) {
+                    e = window.event;
+                }
+                // Check if the Enter key was pressed
+                if ((e.key === 'Enter' || e.keyCode === 13) && e.preventDefault) {
+                    e.preventDefault();
+                    e.target.blur()
+                } else {
+                    e.returnValue = false;
+                }
+            };
+        });
+
+        // ... existing code ...
+    });
+</script>
+
 <script>
     document.querySelectorAll('#bill-table td[contenteditable="true"]').forEach(cell => {
-        cell.addEventListener('blur', function() {
+        cell.addEventListener('blur', function () {
             // Get the row and column index
             var row = cell.parentNode.rowIndex;
             var col = cell.cellIndex;

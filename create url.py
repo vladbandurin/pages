@@ -376,8 +376,8 @@ if __name__=='__main__':
     # Add the encoded data to the URL as a query parameter
     web_app_url = f"http://localhost:63342/pages/webapp.html?data={encoded_data}"
     web_app_url = f"http://localhost:63342/pages/updated_webapp.html?data={encoded_data}"
-    web_app_url = f"http://localhost:63342/pages/updated_webapp_with_interactivity.html?data={encoded_data}"
-    web_app_url = f"http://localhost:63342/pages/updated_webapp_with_modern_css.html?data={encoded_data}"
+    web_app_url = f"http://localhost:63342/pages/updated_webapp_editable.html?data={encoded_data}"
+    # web_app_url = f"http://localhost:63342/pages/updated_webapp_with_modern_css.html?data={encoded_data}"
 
 
 
