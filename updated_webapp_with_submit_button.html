@@ -158,9 +158,13 @@
             selectedItems.push(itemData);
         });
 
+        const returnData = {
+            "user": tg.initDataUnsafe.user.first_name,
+            "selectedItems": selectedItems
+        }
         // Send data to the Telegram bot
         if (selectedItems.length > 0) {
-            tg.sendData(JSON.stringify(selectedItems));
+            tg.sendData(JSON.stringify(returnData));
         }
 
     });
