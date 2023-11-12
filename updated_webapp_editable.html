@@ -122,9 +122,9 @@
                 const row = tableBody.insertRow();
                 row.setAttribute('data-price', item.price);
                 row.innerHTML = `
-                        <td contenteditable="true">${item.name}</td>
-                        <td contenteditable="true" class="single-line-cell">${item.quantity}</td>
-                        <td contenteditable="true" class="single-line-cell">${item.price}</td>
+                        <td >${item.name}</td>
+                        <td  class="single-line-cell">${item.quantity}</td>
+                        <td  class="single-line-cell">${item.price}</td>
                     `;
                 row.onclick = () => toggleSelection(row);
             });
@@ -151,6 +151,27 @@
                     e.target.blur()
                 }
             };
+        });
+
+        // ... existing code ...
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // ... existing code ...
+
+        // Add double-click event listener to cells
+        document.querySelectorAll('.single-line-cell').forEach(cell => {
+            cell.addEventListener('dblclick', function () {
+                this.setAttribute('contenteditable', 'true');
+                this.focus(); // Focus on the cell to start editing
+            });
+
+            // Add blur event to disable editing when focus is lost
+            cell.addEventListener('blur', function () {
+                this.removeAttribute('contenteditable');
+            });
         });
 
         // ... existing code ...
